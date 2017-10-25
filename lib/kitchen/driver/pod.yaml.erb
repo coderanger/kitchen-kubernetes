@@ -1,0 +1,50 @@
+#
+# Copyright 2017, Noah Kantrowitz
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: <%= state[:pod_id] %>
+spec:
+  initContainers:
+  - name: chef
+    image: <%= config[:chef_image] %>:<%= config[:chef_version] %>
+    <% if config[:chef_version] == 'latest' %>
+    command: ["/bin/cp", "-a", "-u", "/opt/chef", "/mnt"]
+    <% else %>
+    command: ["/bin/sh", "-c", "if [ ! -d /mnt/chef/bin ]; then cp -a /opt/chef /mnt; fi"]
+    <% end %>
+    volumeMounts:
+    - mountPath: /mnt/chef
+      name: chef
+  containers:
+  - name: default
+    image: <%= config[:image] %>
+    command: ["/bin/sh", "-c", "trap 'exit 0' TERM; sleep 2147483647 & wait"]
+    volumeMounts:
+    - mountPath: /opt/chef
+      name: chef
+    - mountPath: /tmp/kitchen
+      name: kitchen
+  - name: rsync
+    image: <%= config[:rsync_image] %>
+    volumeMounts:
+    - mountPath: /tmp/kitchen
+      name: kitchen
+  volumes:
+  - <%= {name: 'chef'}.merge(config[:cache_volume]).to_json %>
+  - name: kitchen
+    emptyDir: {}

@@ -29,9 +29,7 @@ module Kitchen
     # @since 1.0.0
     # @see Kitchen::Driver::Kubernetes
     class Kubernetes < Kitchen::Transport::Base
-      default_config :kubectl_command, 'kubectl'
-      default_config :rsync_command, 'rsync'
-      default_config :rsync_rsh, "#{RbConfig.ruby} -e \"exec('kubectl', 'exec', '--stdin', '--container=rsync', ARGV[0], '--', *ARGV[1..-1])\""
+      # All configuration options can be found in the Driver class.
 
       # (see Base#connection)
       def connection(state, &block)

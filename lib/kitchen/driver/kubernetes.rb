@@ -40,7 +40,9 @@ module Kitchen
       default_config :chef_version, 'latest'
       default_config :kubectl_command, 'kubectl'
       default_config :pod_template, File.expand_path('../pod.yaml.erb', __FILE__)
-      default_config :rsync_image, 'kitchenkubernetes/rsync:latest'
+      default_config :rsync_command, 'rsync'
+      default_config :rsync_image, 'kitchenkubernetes/rsync:3.1.2-r5'
+      default_config :rsync_rsh, "#{RbConfig.ruby} -e \"exec('kubectl', 'exec', '--stdin', '--container=rsync', ARGV[0], '--', *ARGV[1..-1])\""
 
       default_config :cache_volume do |driver|
         if driver[:cache_path]
@@ -69,7 +71,9 @@ module Kitchen
         ].join('-')
       end
 
+      expand_path_for :kubectl_command
       expand_path_for :pod_template
+      expand_path_for :rsync_command
 
       # Muck with some other plugins to make the UX easier. Haxxxx.
       #
@@ -78,7 +82,7 @@ module Kitchen
         super.tap do
           # Force the use of the Kubernetes transport since it isn't much use
           # without that.
-          instance.transport = Kitchen::Transport::Kubernetes.new(instance.transport.send(:config).merge(kubectl_command: config[:kubectl_command]))
+          instance.transport = Kitchen::Transport::Kubernetes.new(config)
           # Leave room for the possibility of other provisioners in the future,
           # but force some options we need.
           if instance.provisioner.is_a?(Kitchen::Provisioner::ChefBase)

@@ -154,7 +154,7 @@ The Poise test server infrastructure is generously sponsored by [Rackspace](http
 
 ## License
 
-Copyright 2013-2016, Noah Kantrowitz
+Copyright 2017, Noah Kantrowitz
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

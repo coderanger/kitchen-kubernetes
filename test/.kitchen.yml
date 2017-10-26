@@ -16,7 +16,6 @@
 
 driver:
   name: kubernetes
-  kubectl_path: ./kubectl
 
 provisioner:
   cookbooks_path: test/cookbooks/

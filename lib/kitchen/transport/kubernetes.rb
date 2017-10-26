@@ -57,6 +57,7 @@ module Kitchen
 
         # (see Base::Connection#upload)
         def upload(locals, remote)
+          return if locals.empty?
           # Use rsync over kubectl exec to send files.
           run_command([options[:rsync_command], '--archive', '--progress', '--rsh', options[:rsync_rsh]] + locals + ["#{options[:pod_id]}:#{remote}"])
         end

@@ -71,9 +71,10 @@ module Kitchen
         ].join('-')
       end
 
-      expand_path_for :kubectl_command
+      # TODO Fix path expansion so it only activates if there is a / or \ in the string.
+      # expand_path_for :kubectl_command
       expand_path_for :pod_template
-      expand_path_for :rsync_command
+      # expand_path_for :rsync_command
 
       # Muck with some other plugins to make the UX easier. Haxxxx.
       #

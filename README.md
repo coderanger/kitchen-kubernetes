@@ -150,8 +150,6 @@ Yes, just make sure you have the minikube config context activated.
 
 Development sponsored by [SAP](https://www.sap.com/).
 
-The Poise test server infrastructure is generously sponsored by [Rackspace](https://rackspace.com/). Thanks Rackspace!
-
 ## License
 
 Copyright 2017, Noah Kantrowitz

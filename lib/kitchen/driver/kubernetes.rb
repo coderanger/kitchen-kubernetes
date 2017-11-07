@@ -101,6 +101,34 @@ module Kitchen
               root_path: '/tmp/kitchen/verifier',
               sudo: false,
             )
+          elsif defined?(Kitchen::Verifier::Inspec) && instance.verifier.is_a?(Kitchen::Verifier::Inspec)
+            # Monkeypatch kitchen-inspec to use my copy of the kubernetes train transport.
+            # Pending https://github.com/chef/train/pull/205 and https://github.com/chef/kitchen-inspec/pull/148
+            # or https://github.com/chef/kitchen-inspec/pull/149.
+            require 'kitchen/verifier/train_kubernetes_hack'
+            _config = config # Because closure madness.
+            old_runner_options = instance.verifier.method(:runner_options)
+            instance.verifier.send(:define_singleton_method, :runner_options) do |transport, state = {}, platform = nil, suite = nil|
+              if transport.is_a?(Kitchen::Transport::Kubernetes)
+                # Initiate 1337 ha><0rz.
+                {
+                  "backend" => "kubernetes_hack",
+                  "logger" => logger,
+                  "pod" => state[:pod_id],
+                  "container" => "default",
+                  "kubectl_path" => _config[:kubectl_path],
+                }.tap do |runner_options|
+                  # Copied directly from kitchen-inspec because there is no way not to. Sigh.
+                  runner_options["color"] = (config[:color].nil? ? true : config[:color])
+                  runner_options["format"] = config[:format] unless config[:format].nil?
+                  runner_options["output"] = config[:output] % { platform: platform, suite: suite } unless config[:output].nil?
+                  runner_options["profiles_path"] = config[:profiles_path] unless config[:profiles_path].nil?
+                  runner_options[:controls] = config[:controls]
+                end
+              else
+                old_runner_options.call(transport, state, platform, suite)
+              end
+            end
           end
         end
       end

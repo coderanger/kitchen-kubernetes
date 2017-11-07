@@ -17,7 +17,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: <%= state[:pod_id] %>
+  name: <%= pod_id %>
 spec:
   initContainers:
   - name: chef

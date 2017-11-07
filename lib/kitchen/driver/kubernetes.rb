@@ -138,7 +138,7 @@ module Kitchen
         # Already created, we're good.
         return if state[:pod_id]
         # Lock in our name with randomness and whatever.
-        state[:pod_id] = config[:pod_name]
+        pod_id = config[:pod_name]
         # Render the pod YAML and feed it to kubectl.
         tpl = ERB.new(IO.read(config[:pod_template]), 0, '-')
         tpl.filename = config[:pod_template]
@@ -153,16 +153,30 @@ module Kitchen
             # More than 20 seconds, start giving user feedback. 20 second threshold
             # was 100% pulled from my ass based on how long it takes to launch
             # on my local minikube, may need changing for reality.
-            info("Waiting for pod #{state[:pod_id]} to be running, currently #{status}")
+            info("Waiting for pod #{pod_id} to be running, currently #{status}")
           end
           sleep(1)
           # Can't use run_command here because error! is unwanted and logging is a bit much.
-          status_cmd = Mixlib::ShellOut.new(config[:kubectl_command], 'get', 'pod', state[:pod_id], '--output=json')
+          status_cmd = Mixlib::ShellOut.new(config[:kubectl_command], 'get', 'pod', pod_id, '--output=json')
           status_cmd.run_command
           unless status_cmd.error? || status_cmd.stdout.empty?
             status = JSON.parse(status_cmd.stdout)['status']['phase']
           end
         end
+        # Save the pod ID.
+        state[:pod_id] = pod_id
+      rescue Exception => ex
+        # If something goes wrong, try to clean up.
+        if pod_id
+          begin
+            debug("Failure during create, trying to clean up pod #{pod_id}")
+            run_command([config[:kubectl_command], 'delete', 'pod', pod_id, '--now'])
+          rescue ShellCommandFailed => cleanup_ex
+            # Welp, we tried.
+            debug("Cleanup failed, continuing anyway: #{cleanup_ex}")
+          end
+        end
+        raise ex
       end
 
       # (see Base#destroy)

@@ -38,6 +38,8 @@ module Kitchen
       default_config :cache_path, '/data/chef/%{chef_version}'
       default_config :chef_image, 'chef/chef'
       default_config :chef_version, 'latest'
+      default_config :image_pull_policy, nil
+      default_config :image_pull_secrets, nil
       default_config :kubectl_command, 'kubectl'
       default_config :pod_template, File.expand_path('../pod.yaml.erb', __FILE__)
       default_config :rsync_command, 'rsync'

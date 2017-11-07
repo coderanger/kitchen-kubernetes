@@ -22,11 +22,11 @@ spec:
   initContainers:
   - name: chef
     image: <%= config[:chef_image] %>:<%= config[:chef_version] %>
-    <% if config[:chef_version] == 'latest' %>
+    <%- if config[:chef_version] == 'latest' -%>
     command: ["/bin/cp", "-a", "-u", "/opt/chef", "/mnt"]
-    <% else %>
+    <%- else -%>
     command: ["/bin/sh", "-c", "if [ ! -d /mnt/chef/bin ]; then cp -a /opt/chef /mnt; fi"]
-    <% end %>
+    <%- end -%>
     volumeMounts:
     - mountPath: /mnt/chef
       name: chef

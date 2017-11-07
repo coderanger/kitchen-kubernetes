@@ -140,7 +140,7 @@ module Kitchen
         # Lock in our name with randomness and whatever.
         state[:pod_id] = config[:pod_name]
         # Render the pod YAML and feed it to kubectl.
-        tpl = ERB.new(IO.read(config[:pod_template]))
+        tpl = ERB.new(IO.read(config[:pod_template]), 0, '-')
         tpl.filename = config[:pod_template]
         pod_yaml = tpl.result(binding)
         debug("Creating pod with YAML:\n#{pod_yaml}\n")

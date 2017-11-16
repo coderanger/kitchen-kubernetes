@@ -124,7 +124,8 @@ This transport plugin is configured automatically by the driver for your conveni
 and uses `kubectl exec` for running commands on the test container. For sending
 files, rsync is used. The rsync data is also sent over `kubectl exec` to avoid
 needing to configure any additional network login services. This uses the `rsync`
-container in the pod and the `kitchen` volume.
+container in the pod and the `kitchen` volume. This does require `rsync` is also
+installed on your workstation (or where ever `kitchen` is running from).
 
 ## FAQ
 

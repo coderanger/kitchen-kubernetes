@@ -41,3 +41,18 @@ suites:
 - name: default
   run_list:
   - recipe[test]
+- name: service
+  run_list:
+  - recipe[test::service]
+  driver:
+    init_system: systemd
+  includes:
+  - centos-7
+  - ubuntu-16.04
+  - debian-9
+  - fedora-26
+- name: inspec
+  run_list:
+  - recipe[test]
+  verifier:
+    name: inspec

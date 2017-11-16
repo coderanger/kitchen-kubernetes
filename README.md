@@ -8,7 +8,7 @@
 
 A [Test Kitchen](https://kitchen.ci/) driver for testing on top of a Kubernetes
 cluster. It is currently aimed at Chef cookbook testing, though see the [FAQ](#FAQ)
-for more information on other testing target.
+for more information on other testing targets.
 
 ## Quick Start
 

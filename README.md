@@ -127,6 +127,24 @@ needing to configure any additional network login services. This uses the `rsync
 container in the pod and the `kitchen` volume. This does require `rsync` is also
 installed on your workstation (or where ever `kitchen` is running from).
 
+## Systemd
+
+If you want to enable systemd inside the container, set `init_system: systemd`.
+For example:
+
+```yaml
+driver:
+  name: kubernetes
+
+platforms:
+- name: centos-7
+  driver:
+    init_system: systemd
+- name: ubuntu-16.04
+  driver:
+    init_system: systemd
+```
+
 ## FAQ
 
 ### Can I use this for testing things other than Chef?

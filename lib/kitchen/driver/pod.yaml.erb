@@ -36,12 +36,74 @@ spec:
     <%- if config[:image_pull_policy] %>
     imagePullPolicy: <%= config[:image_pull_policy] %>
     <%- end -%>
+    <%- if config[:init_system] == 'systemd' -%>
+    env:
+    - name: container
+      value: docker
+    command: ["/sbin/init"]
+    <%- elsif config[:init_system] == 'upstart' -%>
+    env:
+    - name: container
+      value: docker
+    command:
+    # This is a bit long to avoid putting stuff in the image.
+    - '/bin/sh'
+    - '-c'
+    - |-
+      echo '
+      # fake some events needed for correct startup other services
+
+      description     "In-Container Upstart Fake Events"
+
+      start on startup
+
+      script
+        rm -rf /var/run/*.pid
+        rm -rf /var/run/network/*
+        /sbin/initctl emit stopped JOB=udevtrigger --no-wait
+        /sbin/initctl emit started JOB=udev --no-wait
+        /sbin/initctl emit runlevel RUNLEVEL=3 --no-wait
+      end script
+      ' > /etc/init/fake-container-events.conf;
+      rm /usr/sbin/policy-rc.d;
+      rm /sbin/initctl;
+      dpkg-divert --rename --remove /sbin/initctl;
+      /usr/sbin/update-rc.d -f ondemand remove;
+      for f in \
+        /etc/init/u*.conf \
+        /etc/init/mounted-dev.conf \
+        /etc/init/mounted-proc.conf \
+        /etc/init/mounted-run.conf \
+        /etc/init/mounted-tmp.conf \
+        /etc/init/mounted-var.conf \
+        /etc/init/hostname.conf \
+        /etc/init/networking.conf \
+        /etc/init/tty*.conf \
+        /etc/init/plymouth*.conf \
+        /etc/init/hwclock*.conf \
+        /etc/init/module*.conf \
+      ; do
+        dpkg-divert --local --rename --add "$f"; \
+      done;
+      echo '# /lib/init/fstab: cleared out for bare-bones Docker' > /lib/init/fstab;
+      exec /sbin/init
+    <%- else -%>
     command: ["/bin/sh", "-c", "trap 'exit 0' TERM; sleep 2147483647 & wait"]
+    <%- end -%>
     volumeMounts:
     - mountPath: /opt/chef
       name: chef
     - mountPath: /tmp/kitchen
       name: kitchen
+    <%- if config[:init_system] == 'systemd' -%>
+    - mountPath: /tmp
+      name: systemd-tmp
+    - mountPath: /run
+      name: systemd-run
+    - mountPath: /sys/fs/cgroup
+      name: systemd-cgroup
+      readOnly: true
+    <%- end -%>
   - name: rsync
     image: <%= config[:rsync_image] %>
     volumeMounts:
@@ -51,6 +113,18 @@ spec:
   - <%= {name: 'chef'}.merge(config[:cache_volume]).to_json %>
   - name: kitchen
     emptyDir: {}
+  <%- if config[:init_system] == 'systemd' -%>
+  - name: systemd-tmp
+    emptyDir:
+      medium: Memory
+  - name: systemd-run
+    emptyDir:
+      medium: Memory
+  - name: systemd-cgroup
+    hostPath:
+      path: /sys/fs/cgroup
+      type: Directory
+  <%- end -%>
   <%- if config[:image_pull_secrets] -%>
   imagePullSecrets: <%= Array(config[:image_pull_secrets]).map {|n| {name: n} }.to_json %>
   <%- end -%>

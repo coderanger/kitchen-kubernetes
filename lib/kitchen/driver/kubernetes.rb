@@ -23,6 +23,8 @@ require 'kitchen/shell_out'
 require 'kitchen/verifier/busser'
 
 require 'kitchen/transport/kubernetes'
+require 'kitchen-kubernetes/helper'
+
 
 module Kitchen
   module Driver
@@ -30,14 +32,16 @@ module Kitchen
     # Kubernetes driver for Kitchen.
     #
     # @author Noah Kantrowitz <noah@coderanger>
-    # @since 1.0.0
+    # @since 1.0
     # @see Kitchen::Transport::Kubernetes
     class Kubernetes < Kitchen::Driver::Base
       include ShellOut
+      include KitchenKubernetes::Helper
 
       default_config :cache_path, '/data/chef/%{chef_version}'
       default_config :chef_image, 'chef/chef'
       default_config :chef_version, 'latest'
+      default_config :context, nil
       default_config :image_pull_policy, nil
       default_config :image_pull_secrets, nil
       default_config :init_system, nil
@@ -120,6 +124,7 @@ module Kitchen
                   "pod" => state[:pod_id],
                   "container" => "default",
                   "kubectl_path" => _config[:kubectl_path],
+                  "context" => _config[:context],
                 }.tap do |runner_options|
                   # Copied directly from kitchen-inspec because there is no way not to. Sigh.
                   runner_options["color"] = (config[:color].nil? ? true : config[:color])
@@ -147,7 +152,7 @@ module Kitchen
         tpl.filename = config[:pod_template]
         pod_yaml = tpl.result(binding)
         debug("Creating pod with YAML:\n#{pod_yaml}\n")
-        run_command([config[:kubectl_command], 'create', '--filename', '-'], input: pod_yaml)
+        run_command(kubectl_command('create', '--filename', '-'), input: pod_yaml)
         # Wait until the pod reaches Running status.
         status = nil
         start_time = Time.now
@@ -160,7 +165,7 @@ module Kitchen
           end
           sleep(1)
           # Can't use run_command here because error! is unwanted and logging is a bit much.
-          status_cmd = Mixlib::ShellOut.new(config[:kubectl_command], 'get', 'pod', pod_id, '--output=json')
+          status_cmd = Mixlib::ShellOut.new(kubectl_command('get', 'pod', pod_id, '--output=json'))
           status_cmd.run_command
           unless status_cmd.error? || status_cmd.stdout.empty?
             status = JSON.parse(status_cmd.stdout)['status']['phase']
@@ -173,7 +178,7 @@ module Kitchen
         if pod_id
           begin
             debug("Failure during create, trying to clean up pod #{pod_id}")
-            run_command([config[:kubectl_command], 'delete', 'pod', pod_id, '--now'])
+            run_command(kubectl_command('delete', 'pod', pod_id, '--now'))
           rescue ShellCommandFailed => cleanup_ex
             # Welp, we tried.
             debug("Cleanup failed, continuing anyway: #{cleanup_ex}")
@@ -185,7 +190,7 @@ module Kitchen
       # (see Base#destroy)
       def destroy(state)
         return unless state[:pod_id]
-        run_command([config[:kubectl_command], 'delete', 'pod', state[:pod_id], '--now'])
+        run_command(kubectl_command('delete', 'pod', state[:pod_id], '--now'))
         # Explicitly not waiting for the delete to finish, if k8s has problems
         # with deletes in the future, I can add a wait here.
       rescue ShellCommandFailed => ex

@@ -29,6 +29,7 @@ module Train::Transports
     option :pod, required: true
     option :container, default: nil
     option :kubectl_path, default: 'kubectl'
+    option :context, default: nil
 
     def connection(state = {})
       opts = merge_options(options, state || {})
@@ -52,6 +53,7 @@ module Train::Transports
 
       def run_command(cmd)
         kubectl_cmd = [options[:kubectl_path], 'exec']
+        kubectl_cmd.concat(['--context', options[:context]]) if options[:context]
         kubectl_cmd.concat(['--container', options[:container]]) if options[:container]
         kubectl_cmd.concat([options[:pod], '--', '/bin/sh', '-c', cmd])
 

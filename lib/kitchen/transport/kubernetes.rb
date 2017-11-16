@@ -20,6 +20,9 @@ require 'kitchen/login_command'
 require 'kitchen/shell_out'
 require 'kitchen/transport/base'
 
+require 'kitchen-kubernetes/helper'
+
+
 module Kitchen
   module Transport
 
@@ -47,12 +50,13 @@ module Kitchen
 
       class Connection < Kitchen::Transport::Base::Connection
         include ShellOut
+        include KitchenKubernetes::Helper
 
         # (see Base::Connection#execute)
         def execute(command)
           return if command.nil?
           # Run via kubectl exec.
-          run_command([options[:kubectl_command], 'exec', '--tty', '--container=default', options[:pod_id], '--'] + Shellwords.split(command))
+          run_command(kubectl_command('exec', '--tty', '--container=default', options[:pod_id], '--', *Shellwords.split(command)))
         end
 
         # (see Base::Connection#upload)
@@ -69,7 +73,9 @@ module Kitchen
           # busybox. Also CentOS images doesn't have `which` for some reason.
           # Dash's `type` is super weird so use `which` first in case of dash but
           # fall back to `type` for basically just CentOS.
-          LoginCommand.new(options[:kubectl_command], ['exec', '--stdin', '--tty', '--container=default', options[:pod_id], '--', '/bin/sh', '-c', "IFS=$'\n'; for f in `which bash zsh sh 2>/dev/null || type -P bash zsh sh`; do exec \"$f\" -l; done"])
+          login_cmd = "IFS=$'\n'; for f in `which bash zsh sh 2>/dev/null || type -P bash zsh sh`; do exec \"$f\" -l; done"
+          cmd = kubectl_command('exec', '--stdin', '--tty', '--container=default', options[:pod_id], '--', '/bin/sh', '-c', login_cmd)
+          LoginCommand.new(cmd[0], cmd.drop(1))
         end
       end
     end

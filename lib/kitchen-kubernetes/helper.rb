@@ -16,5 +16,30 @@
 
 
 module KitchenKubernetes
-  VERSION = "1.0.0"
+  # Utility mixin for other classes in this plugin.
+  #
+  # @since 1.0
+  # @api private
+  module Helper
+    # Because plugins and connections have different APIs.
+    def kube_options
+      if defined?(config)
+        config
+      elsif defined?(options)
+        options
+      else
+        raise "Something went wrong, please file a bug"
+      end
+    end
+
+    def kubectl_command(*cmd)
+      out = [kube_options[:kubectl_command]]
+      if kube_options[:context]
+        out << '--context'
+        out << kube_options[:context]
+      end
+      out.concat(cmd)
+      out
+    end
+  end
 end

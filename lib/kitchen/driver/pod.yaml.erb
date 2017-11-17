@@ -54,6 +54,8 @@ spec:
       name: systemd-tmp
     - mountPath: /run
       name: systemd-run
+    - mountPath: /run/lock
+      name: systemd-lock
     - mountPath: /sys/fs/cgroup
       name: systemd-cgroup
       readOnly: true
@@ -72,6 +74,9 @@ spec:
     emptyDir:
       medium: Memory
   - name: systemd-run
+    emptyDir:
+      medium:
+  - name: systemd-lock
     emptyDir:
       medium: Memory
   - name: systemd-cgroup

@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+apt_update if platform_family?('debian')
+
 package_name = platform_family?('rhel', 'amazon', 'fedora') ? 'httpd' : 'apache2'
 
 package package_name

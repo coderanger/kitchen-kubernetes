@@ -17,13 +17,13 @@
 describe file('/testfile') do
   it { is_expected.to be_a_file }
   it { is_expected.to be_owned_by 'root' }
-  it { is_expected.to be_mode 741 }
+  it { is_expected.to be_mode 0741 }
   its(:content) { is_expected.to eq "I am a teapot\n" }
 end
 
 describe file('/testtemplate') do
   it { is_expected.to be_a_file }
   it { is_expected.to be_owned_by 'root' }
-  it { is_expected.to be_mode 444 }
+  it { is_expected.to be_mode 0444 }
   its(:content) { is_expected.to match /^ver=13/ }
 end

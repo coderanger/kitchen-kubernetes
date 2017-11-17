@@ -145,6 +145,10 @@ platforms:
     init_system: systemd
 ```
 
+As a word of warning, the default `debian` Docker images do not include systemd,
+so you will need to make your own that have it installed if you want to test on
+systemd and Debian.
+
 ## FAQ
 
 ### Can I use this for testing things other than Chef?

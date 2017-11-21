@@ -42,6 +42,7 @@ module Kitchen
           kubectl_command: config[:kubectl_command],
           rsync_command: config[:rsync_command],
           rsync_rsh: config[:rsync_rsh],
+          log_level: config[:log_level],
           logger: logger
         ).tap do |conn|
           block.call(conn) if block
@@ -63,7 +64,7 @@ module Kitchen
         def upload(locals, remote)
           return if locals.empty?
           # Use rsync over kubectl exec to send files.
-          run_command([options[:rsync_command], '--archive', '--progress', '--rsh', options[:rsync_rsh]] + locals + ["#{options[:pod_id]}:#{remote}"])
+          run_command([options[:rsync_command], '--archive', '--progress', '--blocking-io', '--rsh', options[:rsync_rsh]] + (options[:log_level] == :debug ? %w{--verbose --verbose --verbose} : []) + locals + ["#{options[:pod_id]}:#{remote}"])
         end
 
         # (see Base::Connection#login_command)

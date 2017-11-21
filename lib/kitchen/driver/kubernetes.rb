@@ -69,7 +69,7 @@ module Kitchen
       end
 
       default_config :pod_name do |driver|
-        # Borrowed from kitchen-rackspace
+        # Borrowed from kitchen-rackspace.
         [
           driver.instance.name.gsub(/\W/, ''),
           (Etc.getlogin || 'nologin').gsub(/\W/, ''),

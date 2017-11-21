@@ -44,7 +44,9 @@ driver:
 * `cache_volume` - Kubernetes [volume](https://kubernetes.io/docs/api-reference/v1.8/#volume-v1-core) description for the Chef install volume. *(default: auto-generated)*
 * `chef_image` - Docker data image to get the Chef installation from. *(default: chef/chef)*
 * `chef_version` - Version of the Chef data image to use. *(default: latest)*
+* `context` - Kubectl configuration context to use. *(default: current-context)*
 * `image` - Docker image for the main container in the pod, where Chef is run. *(default: based on the platform name and version)*
+* `init_system` - Init system to activate in the default container. See #systemd. *(default: nil)*
 * `kubectl_command` - Path to the `kubectl` command to use. *(default: kubectl)*
 * `pod_name` - Name of the generated pod. *(default: auto-generate)*
 * `pod_template` - Path to the Erb template to create the pod. See [below](#pod). *(default: internal)*

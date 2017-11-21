@@ -61,7 +61,7 @@ module Kitchen
       end
 
       default_config :image do |driver|
-        driver.default_instance
+        driver.default_image
       end
 
       default_config :pod_name do |driver|

@@ -74,10 +74,15 @@ module Kitchen
         ].join('-')
       end
 
-      # TODO Fix path expansion so it only activates if there is a / or \ in the string.
-      # expand_path_for :kubectl_command
+      # Don't expand path on commands that don't look like a path, otherwise
+      # it turns kubectl in to /path/to/cookbook/kubectl.
+      expand_path_for :kubectl_command do |driver|
+        driver[:kubectl_command] =~ %r{/|\\}
+      end
       expand_path_for :pod_template
-      # expand_path_for :rsync_command
+      expand_path_for :rsync_command do |driver|
+        driver[:rsync_command] =~ %r{/|\\}
+      end
 
       # Work out the default primary container image to use for this instance.
       # Can be overridden by subclasses. Must return a string compatible with

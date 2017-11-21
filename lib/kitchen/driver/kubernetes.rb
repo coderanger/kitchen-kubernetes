@@ -61,11 +61,7 @@ module Kitchen
       end
 
       default_config :image do |driver|
-        if driver.instance.platform.name =~ /^(.*)-([^-]*)$/
-          "#{$1}:#{$2}"
-        else
-          driver.instance.platform.name
-        end
+        driver.default_instance
       end
 
       default_config :pod_name do |driver|
@@ -82,6 +78,19 @@ module Kitchen
       # expand_path_for :kubectl_command
       expand_path_for :pod_template
       # expand_path_for :rsync_command
+
+      # Work out the default primary container image to use for this instance.
+      # Can be overridden by subclasses. Must return a string compatible with
+      # a Kubernetes container image specification.
+      #
+      # @return [String]
+      def default_image
+        if instance.platform.name =~ /^(.*)-([^-]*)$/
+          "#{$1}:#{$2}"
+        else
+          instance.platform.name
+        end
+      end
 
       # Muck with some other plugins to make the UX easier. Haxxxx.
       #

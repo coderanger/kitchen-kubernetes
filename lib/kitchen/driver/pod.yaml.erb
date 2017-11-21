@@ -18,6 +18,13 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: <%= pod_id %>
+  labels:
+    heritage: kitchen-kubernetes
+  annotations:
+    coderanger.net/kitchen-instance: <%= instance.name %>
+    coderanger.net/kitchen-platform: <%= instance.platform.name %>
+    coderanger.net/kitchen-created-by: <%= Etc.getlogin || 'unknown' %>
+    coderanger.net/kitchen-created-on: <%= Socket.gethostname %>
 spec:
   initContainers:
   - name: chef

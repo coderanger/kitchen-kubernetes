@@ -43,6 +43,21 @@ spec:
     <%- if config[:image_pull_policy] %>
     imagePullPolicy: <%= config[:image_pull_policy] %>
     <%- end -%>
+    resources:
+      requests:
+        <%- if config[:cpu_requests] -%>
+        cpu: "<%= config[:cpu_requests] %>"
+        <%- end -%>
+        <%- if config[:memory_requests] -%>
+        memory: "<%= config[:memory_requests] %>"
+        <%- end -%>
+      limits:
+        <%- if config[:cpu_limit] -%>
+        cpu: "<%= config[:cpu_limit] %>"
+        <%- end -%>
+        <%- if config[:memory_limit] -%>
+        memory: "<%= config[:memory_limit] %>"
+        <%- end -%>
     <%- if config[:init_system] == 'systemd' -%>
     env:
     - name: container

@@ -52,6 +52,10 @@ driver:
 * `pod_template` - Path to the Erb template to create the pod. See [below](#pod). *(default: internal)*
 * `rsync_command` - Path to the `rsync` command to use. *(default: rsync)*
 * `rsync_image` - Docker image to use for the rsync container in the pod. *(default: kitchenkubernetes/rsync)*
+* `cpu_requests` - Kubernetes Resources Request of CPU  *(default: nil)*
+* `memory_requests` - Kubernetes Resources Request of Memory  *(default: nil)*
+* `cpu_limit` - Kubernetes Resources Limit of CPU  *(default: nil)*
+* `memory_limit` - Kubernetes Resources Limit of Memory  *(default: nil)*
 
 ## Chef Install
 

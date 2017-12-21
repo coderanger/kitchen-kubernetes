@@ -16,23 +16,18 @@
 
 sudo: required
 language: ruby
+rvm: 2.4.3
+gemfile:
+  - Gemfile
+  - test/gemfiles/train-old.gemfile
+  - test/gemfiles/train-new.gemfile
+  - test/gemfiles/master.gemfile
 
 services:
   - docker
 
 env:
   - CHANGE_MINIKUBE_NONE_USER=true
-
-matrix:
-  include:
-    - rvm: 2.4.1
-      gemfile: test/gemfiles/train-old.gemfile
-  include:
-    - rvm: 2.4.2
-      gemfile: test/gemfiles/train-new.gemfile
-  include:
-    - rvm: 2.4.3
-      gemfile: test/gemfiles/master.gemfile
 
 before_install:
   - 'if [[ $BUNDLE_GEMFILE == *master.gemfile ]]; then gem update --system; fi'

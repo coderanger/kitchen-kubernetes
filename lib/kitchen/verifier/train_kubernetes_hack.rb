@@ -43,8 +43,12 @@ module Train::Transports
     end
 
     class Connection < BaseConnection
-      def os
-        @os ||= OS.new(self)
+      # The API for a connection changed in Train 0.30, using the existence of
+      # OSCommon as a cheap feature flag for now.
+      if defined?(OSCommon)
+        def os
+          @os ||= OSCommon.new(self, {family: 'unix'})
+        end
       end
 
       def file(path)
@@ -72,14 +76,6 @@ module Train::Transports
           "kubernetes://#{options[:pod]}/#{options[:container]}"
         else
           "kubernetes://#{options[:pod]}"
-        end
-      end
-
-      class OS < OSCommon
-        def initialize(backend)
-          # hardcoded to unix/linux for now, until other operating systems
-          # are supported
-          super(backend, { family: 'unix' })
         end
       end
     end

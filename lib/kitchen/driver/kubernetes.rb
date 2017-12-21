@@ -50,6 +50,10 @@ module Kitchen
       default_config :rsync_command, 'rsync'
       default_config :rsync_image, 'kitchenkubernetes/rsync:3.1.2-r5'
       default_config :rsync_rsh, "#{RbConfig.ruby} -e \"exec('kubectl', 'exec', '--stdin', '--container=rsync', ARGV[0], '--', *ARGV[1..-1])\""
+      default_config :cpu_require, nil
+      default_config :memory_require, nil
+      default_config :cpu_limit, nil
+      default_config :memory_limit, nil
 
       default_config :cache_volume do |driver|
         if driver[:cache_path]

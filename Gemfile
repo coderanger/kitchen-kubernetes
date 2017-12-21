@@ -16,8 +16,6 @@
 
 source 'https://rubygems.org'
 
-gemspec
+gemspec path: File.expand_path('..', __FILE__)
 
 git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
-
-gem 'test-kitchen', github: 'test-kitchen/test-kitchen'

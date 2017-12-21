@@ -16,6 +16,7 @@
 
 eval_gemfile File.expand_path('../../../Gemfile', __FILE__)
 
-gem 'train', git: 'https://github.com/chef/train'
-gem 'inspec', git: 'https://github.com/chef/inspec'
-gem 'kitchen-inspec', git: 'https://github.com/chef/kitchen-inspec'
+gem 'train', github: 'chef/train'
+gem 'inspec', github: 'chef/inspec'
+gem 'kitchen-inspec', github: 'chef/kitchen-inspec'
+gem 'test-kitchen', github: 'test-kitchen/test-kitchen'

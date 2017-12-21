@@ -2,7 +2,6 @@
 
 [![Build Status](https://img.shields.io/travis/coderanger/kitchen-kubernetes.svg)](https://travis-ci.org/coderanger/kitchen-kubernetes)
 [![Gem Version](https://img.shields.io/gem/v/kitchen-kubernetes.svg)](https://rubygems.org/gems/kitchen-kubernetes)
-[![Coverage](https://img.shields.io/codecov/c/github/coderanger/kitchen-kubernetes.svg)](https://codecov.io/github/coderanger/kitchen-kubernetes)
 [![Gemnasium](https://img.shields.io/gemnasium/coderanger/kitchen-kubernetes.svg)](https://gemnasium.com/coderanger/kitchen-kubernetes)
 [![License](https://img.shields.io/badge/license-Apache_2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 

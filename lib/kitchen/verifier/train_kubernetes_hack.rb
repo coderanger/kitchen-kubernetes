@@ -43,19 +43,26 @@ module Train::Transports
     end
 
     class Connection < BaseConnection
-      # The API for a connection changed in Train 0.30, using the existence of
-      # OSCommon as a cheap feature flag for now.
-      if defined?(OSCommon)
+      if Gem::Requirement.create('< 0.30').satisfied_by?(Gem::Version.create(Train::VERSION))
+        # The API for a connection changed a lot in 0.30, this is a compat shim.
         def os
-          @os ||= OSCommon.new(self, {family: 'unix'})
+          @os ||= OSCommon.new(self, family: 'unix')
+        end
+
+        def file(path)
+          @files[path] ||= file_via_connection(path)
+        end
+
+        def run_command(cmd)
+          run_command_via_connection(cmd)
         end
       end
 
-      def file(path)
-        @files[path] ||= defined?(Train::File::Remote::Linux) ? Train::File::Remote::Linux.new(self, path) : LinuxFile.new(self, path)
+      def file_via_connection(path)
+        defined?(Train::File::Remote::Linux) ? Train::File::Remote::Linux.new(self, path) : LinuxFile.new(self, path)
       end
 
-      def run_command(cmd)
+      def run_command_via_connection(cmd)
         kubectl_cmd = [options[:kubectl_path], 'exec']
         kubectl_cmd.concat(['--context', options[:context]]) if options[:context]
         kubectl_cmd.concat(['--container', options[:container]]) if options[:container]

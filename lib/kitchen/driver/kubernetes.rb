@@ -71,7 +71,7 @@ module Kitchen
           (Etc.getlogin || 'nologin').gsub(/\W/, ''),
           Socket.gethostname.gsub(/\W/, '')[0..20],
           Array.new(8) { rand(36).to_s(36) }.join
-        ].join('-')
+        ].join('-').downcase
       end
 
       # Don't expand path on commands that don't look like a path, otherwise
